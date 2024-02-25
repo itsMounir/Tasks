@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Traits\FailedValidationResponse;
+use Illuminate\Validation\Rule;
 
 class UpdateUserRequest extends FormRequest
 {
@@ -24,7 +25,14 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => ['required'],
+            'email'=> ['required','email','unique:users,email'],
+            'image' => [
+                'image',
+                'mimes:png,jpg,gif',
+                'max:2764',
+                Rule::dimensions()->maxWidth(3840)->maxHeight(2160),
+            ]
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Traits\FailedValidationResponse;
+use Illuminate\Validation\Rule;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -26,7 +27,15 @@ class UpdateProductRequest extends FormRequest
         return [
             'name' => ['required','unique:products,name'],
             'price' => ['required'],
-            'category_id' => 'required'
+            'category_id' => 'required',
+            'images' => ['array','present','min:2'],
+            'images.*' => [
+                'image',
+                'required',
+                'mimes:png,jpg,gif',
+                'max:2764',
+                Rule::dimensions()->maxWidth(3840)->maxHeight(2160),
+            ]
         ];
     }
 }

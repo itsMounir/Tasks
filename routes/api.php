@@ -21,10 +21,31 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::prefix('v1/')->group(function(){
-    Route::apiResource('user',UserController::class);
-    Route::apiResource('product',ProductController::class);
-    Route::apiResource('category',CategoryController::class);
+Route::prefix('v1/')->group(function () {
+    Route::apiResource('user', UserController::class)->names([
+        'index' => 'users.index',
+        'store' => 'users.store',
+        'show' => 'users.show',
+        'update' => 'users.update',
+        'destroy' => 'users.destroy',
+    ]);
 
+    Route::apiResource('product', ProductController::class)->names([
+        'index' => 'products.index',
+        'store' => 'products.store',
+        'show' => 'products.show',
+        'update' => 'products.update',
+        'destroy' => 'products.destroy',
+    ]);
+
+    Route::apiResource('category', CategoryController::class)->names([
+        'index' => 'categories.index',
+        'store' => 'categories.store',
+        'show' => 'categories.show',
+        'update' => 'categories.update',
+        'destroy' => 'categories.destroy',
+    ]);
 });
+
+// Route::delete('image',[CategoryController::class,'deleteImage']);
 

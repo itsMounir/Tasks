@@ -18,12 +18,6 @@ class UserController extends Controller
         $data = User::latest()->get();
         $message = 'success';
 
-        foreach ($data as $user) {
-            //dd($data[0]);
-            $this->getCreatedFromAttribute($user);
-            //$user['created_from'] = $user->created_at->diffForHumans();
-        }
-
         return response()->json([
             'message' => $message,
             'data' => $data
@@ -35,23 +29,38 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
+
+        //dd($request->file('picture')->store('pictures'));
         try {
-            DB::transaction(function () use ($request) {
-                $user = new User;
+            $responseData = DB::transaction(function () use ($request) {
+            $user = new User;
 
-        $user->forceFill(array_merge([
-            'password' => $request->password
-        ],$request->all()))->save();
+             $user->forceFill(array_merge([
+                'password' => $request->password,
+            ],$request->input()));
 
-        return response()->json([
-            'message' => 'success',
-            'data' => $user
-        ],200);
+            //dd($user);
+
+            // $url = $request->file('image')->store('images','public');
+            $user->save();
+
+            if ($request->hasFile('image')) {
+                $fileName = 'user-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
+                $user->storeImage($request->file('image')->storeAs('users/images', $fileName, 'public'));
+            }
+
+            return [
+                'message' => 'success',
+                'data' => $user
+            ];
+
             });
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'failed , try again later.',
-            ]);
+
+            return response()->json($responseData);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'message' => 'failed , try again later.',
+                ]);
         }
 
     }
@@ -69,10 +78,7 @@ class UserController extends Controller
             ],200);
         }
 
-        //$user['created_from'] = $user->created_at->diffForHumans();
-        $this->getCreatedFromAttribute($user);
 
-        //dd($user);
         return response()->json([
             'message' => 'success',
             'data' => $user
@@ -85,7 +91,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, string $id)
     {
         try {
-            DB::transaction(function () use ($id , $request) {
+            $responseData = DB::transaction(function () use ($id , $request) {
                 $user = User::find($id);
 
         if (! $user) {
@@ -94,18 +100,23 @@ class UserController extends Controller
             ],200);
         }
 
-        $user->forceFill(array_merge([
-            'password' => $request->password
-        ],$request->all()))->save();
+        $user->update($request->input());
 
-        return response()->json([
+        if ($request->hasFile('image')) {
+            $fileName = 'user-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
+            $user->updateImage($request->file('image')->storeAs('users/images', $fileName, 'public'));
+        }
+
+
+        return [
             'message' => 'success',
             'data' => $user
-        ],200);
+        ];
             });
+            return response()->json($responseData);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'failed , try again later.',
+                $e
             ]);
         }
     }
@@ -116,7 +127,7 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         try {
-            DB::transaction(function () use($id) {
+            $responseData = DB::transaction(function () use($id) {
                 $user = User::find($id);
 
         if (! $user) {
@@ -127,11 +138,12 @@ class UserController extends Controller
 
         $user->delete();
 
-        return response()->json([
+        return [
             'message' => 'user deleted successfully',
             'data' => $user
-        ],200);
+        ];
             });
+            return response()->json($responseData);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'failed , try again later.',

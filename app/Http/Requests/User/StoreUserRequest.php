@@ -4,6 +4,7 @@ namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Traits\FailedValidationResponse;
+use Illuminate\Validation\Rule;
 
 class StoreUserRequest extends FormRequest
 {
@@ -26,7 +27,14 @@ class StoreUserRequest extends FormRequest
         return [
             'name' => ['required'],
             'email'=> ['required','email','unique:users,email'],
-            'password' => ['required']
+            'password' => ['required'],
+            'image' => [
+                'image',
+                'required',
+                'mimes:png,jpg,gif',
+                'max:2764',
+                Rule::dimensions()->maxWidth(3840)->maxHeight(2160),
+            ]
         ];
     }
 

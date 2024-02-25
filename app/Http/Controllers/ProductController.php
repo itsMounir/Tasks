@@ -17,10 +17,6 @@ class ProductController extends Controller
     {
         // $data = User::latest()->paginate(100)->all();
         $data = Product::latest()->filter(request(['search','category']))->paginate(30);
-        foreach ($data as $product) {
-            //dd($data[0]);
-            $this->getCreatedFromAttribute($product);
-        }
         $data['categories'] = Category::all();
         $message = 'success';
 
@@ -36,14 +32,24 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         try {
-            DB::transaction(function () use ($request){
-                $product = Product::create($request->all());
+            $responseData = DB::transaction(function () use ($request){
 
-        return response()->json([
+                $product = Product::create($request->input());
+
+                if ($request->hasFile('images')) {
+                    $images = $request->file('images');
+                    $i =0;
+                    foreach ($images as $image) {
+                        $fileName = 'product-' . (time() + $i++). '.' . $image->getClientOriginalExtension();
+                        $product->storeImage($image->storeAs('products/images', $fileName, 'public'));
+                    }
+                }
+        return [
             'message' => 'success',
             'data' => $product
-        ],200);
+        ];
             });
+            return response()->json($responseData);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'failed , try again later.',
@@ -59,19 +65,12 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
+        //$product->getProduct()->find($id)?->get();
         if (! $product) {
             return response()->json([
                 'message' => 'Product not found',
             ],200);
         }
-
-        $this->getCreatedFromAttribute($product);
-
-        $product->with('category')->where('id','=',$id)->get();
-
-
-
-       // dd($product);
 
         return response()->json([
             'message' => 'success',
@@ -86,7 +85,7 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, string $id)
     {
         try {
-            DB::transaction(function () use ($id,$request) {
+            $responseData = DB::transaction(function () use ($id,$request) {
                 $product = Product::find($id);
 
         if (! $product) {
@@ -94,15 +93,24 @@ class ProductController extends Controller
                 'message' => 'Product not found',
             ],200);
         }
+        $product->deleteImages();
+        $product->update($request->input());
 
+        if ($request->hasFile('images')) {
+            $images = $request->file('images');
+            $i =0;
+            foreach ($images as $image) {
+                $fileName = 'product-' . (time() + $i). '.' . $image->getClientOriginalExtension();
+                $product->storeImage($image->storeAs('products/images', $fileName, 'public'));
+            }
+        }
 
-        $product->update($request->all());
-
-        return response()->json([
+        return [
             'message' => 'Product updated successfully',
             'data' => $product
-        ],200);
+        ];
             });
+            return response()->json($responseData);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'failed , try again later.',
@@ -117,7 +125,7 @@ class ProductController extends Controller
     public function destroy(string $id)
     {
         try {
-            DB::transaction(function () use ($id) {
+            $responseData = DB::transaction(function () use ($id) {
                 $product = Product::find($id);
 
         if (! $product) {
@@ -128,11 +136,12 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return response()->json([
+        return [
             'message' => 'Product deleted successfully',
             'data' => $product
-        ],200);
+        ];
             });
+            return response()->json($responseData);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'failed , try again later.',

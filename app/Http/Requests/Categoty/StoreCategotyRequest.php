@@ -4,6 +4,7 @@ namespace App\Http\Requests\Categoty;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Traits\FailedValidationResponse;
+use Illuminate\Validation\Rule;
 
 class StoreCategotyRequest extends FormRequest
 {
@@ -24,7 +25,14 @@ class StoreCategotyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required','unique:categories,name']
+            'name' => ['required','unique:categories,name'],
+            'image' => [
+                'image',
+                'required',
+                'mimes:png,jpg,gif',
+                'max:2764',
+                Rule::dimensions()->maxWidth(3840)->maxHeight(2160),
+            ]
         ];
     }
 }
