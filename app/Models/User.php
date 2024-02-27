@@ -13,16 +13,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable,HasImage;
 
-    protected static function booted()
-    {
-        parent::boot();
-
-        if (request()->route()->getName() === 'users.show' || request()->route()->getName() === 'users.index') {
-            static::retrieved(function ($user) {
-                $user->created_from = $user->created_at->diffForHumans();
-            });
-        }
-    }
         /**
      * The attributes that are mass assignable.
      *
@@ -32,6 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
     ];
+
+    protected $appends = ['created_from'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -53,9 +45,14 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    protected $with = ['image:id,url,imageable_id'];
+
 
     public function products() {
         return $this->hasMany(Product::class);
     }
 
+    public function getCreatedFromAttribute() {
+        return $this->created_at->diffForHumans();
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\OwnerNameScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasImage;
@@ -13,17 +14,15 @@ class Product extends Model
 
     protected $guarded = [];
 
-   // protected $with = ['category'];
+    protected $appends = ['created_from'];
+
 
     protected static function booted()
     {
         static::addGlobalScope(new PriceScope);
 
-        parent::boot();
-        if (request()->route()->getName() === 'products.show' || request()->route()->getName() === 'products.index'){
-        static::retrieved(function ($product) {
-            $product->created_from = $product->created_at->diffForHumans();
-            });
+        if (request()->route()?->getName() == 'categories.show' || request()->route()?->getName() == 'categories.index') {
+            static::addGlobalScope(new OwnerNameScope);
         }
     }
 
@@ -42,9 +41,9 @@ class Product extends Model
                 $query->where('category_id',$category)));
     }
 
-    protected $with = ['image'];
+    protected $with = ['image:id,url,imageable_id'];
     public function category() {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class,'category_id');
     }
 
     public function owner() {
@@ -53,6 +52,10 @@ class Product extends Model
 
     public function image(){
         return $this->morphMany(Image::class,'imageable');
+    }
+
+    public function getCreatedFromAttribute() {
+        return $this->created_at->diffForHumans();
     }
 
 }

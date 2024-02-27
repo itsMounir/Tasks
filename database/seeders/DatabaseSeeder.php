@@ -28,10 +28,14 @@ class DatabaseSeeder extends Seeder
 
         Category::factory()->create([
             'name' => 'Tech',
+            'parent_id' => null,
+            'type' => 'main'
         ]);
 
         Category::factory()->create([
             'name' => 'Candies',
+            'parent_id' => null,
+            'type' => 'main'
         ]);
 
         Product::factory()->create([

@@ -5,22 +5,21 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Categoty\StoreCategotyRequest;
 use App\Http\Requests\Categoty\UpdateCategotyRequest;
 use App\Models\Category;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
-class CategoryController extends Controller
+class CategoriesController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        // $data = User::latest()->paginate(100)->all();
-        $data = Category::latest()->get();
-        $message = 'success';
+    public function index(){
+         $data = Category::where('type','main')
+         ->with(['products','products.owner' => function ($query) {
+            $query->where('name','like','%a%');
+         }])->get();
 
         return response()->json([
-            'message' => $message,
+            'message' => 'success',
             'data' => $data
         ],200);
     }
@@ -30,9 +29,21 @@ class CategoryController extends Controller
      */
     public function store(StoreCategotyRequest $request)
     {
-        try {
+       try {
             $responseData = DB::transaction(function () use ($request) {
-                $category = Category::create($request->input());
+                if($request?->type == 'main')
+                {
+                    if ($request?->parent_id) {
+                        $category = Category::create($request->input());
+                    }
+                    else {
+                        $category = Category::create(array_merge($request->input(),['parent_id' => null]));
+                    }
+                }
+                else {
+                    $category = Category::create(array_merge($request->input(),['type' => 'sub']));
+                }
+
 
                 if ($request->hasFile('image')) {
                     $fileName = 'category-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
@@ -58,20 +69,13 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      *
-     * When you execute show and index functions in categories controller retrieve the
-      *  products of it and for each product retrieve the owner of it where owner name contains
-      *  “a” letter.
      */
     public function show(string $id)
     {
-
-        $category = Category::where('id',$id)->
-        with(['products' => function ($query) use($id) {
-            $query->where('category_id', $id)
-                  ->with(['owner'=> function ($subQuery) {
-                      $subQuery->where('name', 'like','%a%');
-                  }]);
-        }])->get();
+        $category = Category::where('id',$id)
+             ->with(['products','products.owner' => function ($query) {
+                $query->where('name','like','%a%');
+             }])->get();
 
         // dd($category[0]['products']->isEmpty()); #1
 
@@ -102,7 +106,15 @@ class CategoryController extends Controller
                     'message' => 'category not found',
                 ],200);
             }
+            //dd(is_null($request->parent_id));
+
+            if ($request?->type == 'sub' && is_null($request->parent_id) && is_null($request->parent_id)) {
+                throw new \Exception("parent_id is required to complete the update .", 1);
+            }
+
             $category->update($request->input());
+
+
            // dd($request->hasFile('image'));
             if ($request->hasFile('image')) {
                 $fileName = 'category-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
@@ -117,7 +129,7 @@ class CategoryController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'failed , try again later.',
+                'message' => $e->getMessage(),
             ]);
         }
 

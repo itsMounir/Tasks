@@ -8,7 +8,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 
-class ProductController extends Controller
+class ProductsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,12 +16,11 @@ class ProductController extends Controller
     public function index()
     {
         // $data = User::latest()->paginate(100)->all();
-        $data = Product::latest()->filter(request(['search','category']))->paginate(30);
-        $data['categories'] = Category::all();
-        $message = 'success';
+        // $data = Product::latest()->filter(request(['search','category']))->paginate(30);
+        $data = Product::latest()->get();
 
         return response()->json([
-            'message' => $message,
+            'message' => 'success',
             'data' => $data
         ],200);
     }

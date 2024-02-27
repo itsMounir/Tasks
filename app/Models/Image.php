@@ -10,6 +10,15 @@ class Image extends Model
 {
     use HasFactory;
 
+    protected static function booted()
+    {
+        parent::boot();
+
+            static::retrieved(function ($image) {
+                $image->url = asset($image->url);
+            });
+    }
+
     protected $guarded = [];
 
     protected static function boot() {

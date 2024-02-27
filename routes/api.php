@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,29 +22,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::prefix('v1/')->group(function () {
-    Route::apiResource('user', UserController::class)->names([
-        'index' => 'users.index',
-        'store' => 'users.store',
-        'show' => 'users.show',
-        'update' => 'users.update',
-        'destroy' => 'users.destroy',
-    ]);
-
-    Route::apiResource('product', ProductController::class)->names([
-        'index' => 'products.index',
-        'store' => 'products.store',
-        'show' => 'products.show',
-        'update' => 'products.update',
-        'destroy' => 'products.destroy',
-    ]);
-
-    Route::apiResource('category', CategoryController::class)->names([
-        'index' => 'categories.index',
-        'store' => 'categories.store',
-        'show' => 'categories.show',
-        'update' => 'categories.update',
-        'destroy' => 'categories.destroy',
-    ]);
+    Route::apiResource('users', UsersController::class);
+    Route::apiResource('products', ProductsController::class);
+    Route::apiResource('categories', CategoriesController::class);
 });
 
 // Route::delete('image',[CategoryController::class,'deleteImage']);

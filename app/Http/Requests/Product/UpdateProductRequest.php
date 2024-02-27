@@ -25,13 +25,10 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required','unique:products,name'],
-            'price' => ['required'],
-            'category_id' => 'required',
-            'images' => ['array','present','min:2'],
+            'name' => ['unique:products,name'],
+            'images' => ['array','min:2'],
             'images.*' => [
                 'image',
-                'required',
                 'mimes:png,jpg,gif',
                 'max:2764',
                 Rule::dimensions()->maxWidth(3840)->maxHeight(2160),

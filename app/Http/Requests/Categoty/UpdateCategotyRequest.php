@@ -26,6 +26,7 @@ class UpdateCategotyRequest extends FormRequest
     {
         return [
             'name' => ['unique:categories,name'],
+            'parent_id' => ['exists:categories,id'],
             'image' => [
                 'image',
                 'mimes:png,jpg,gif',

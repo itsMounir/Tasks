@@ -26,6 +26,7 @@ class StoreCategotyRequest extends FormRequest
     {
         return [
             'name' => ['required','unique:categories,name'],
+            'parent_id' => ['exists:categories,id','required_unless:type,main'],
             'image' => [
                 'image',
                 'required',
