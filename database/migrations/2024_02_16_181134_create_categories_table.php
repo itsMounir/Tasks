@@ -15,10 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('type')->nullable();
-            $table->unsignedBigInteger('parent_id')->nullable()->constrained();
+            $table->unsignedBigInteger('parent_id')->nullable()->constrained()->cascadeOnDelete();
             $table->timestamps();
 
-           // $table->foreign('parent_id')->references('id')->on('categories');
         });
     }
 

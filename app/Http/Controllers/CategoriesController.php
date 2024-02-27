@@ -27,8 +27,7 @@ class CategoriesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCategotyRequest $request)
-    {
+    public function store(StoreCategotyRequest $request){
        try {
             $responseData = DB::transaction(function () use ($request) {
                 if($request?->type == 'main')
@@ -44,11 +43,8 @@ class CategoriesController extends Controller
                     $category = Category::create(array_merge($request->input(),['type' => 'sub']));
                 }
 
-
-                if ($request->hasFile('image')) {
-                    $fileName = 'category-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
-                    $category->storeImage($request->file('image')->storeAs('categories/images', $fileName, 'public'));
-                }
+                $fileName = 'category-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
+                $category->storeImage($request->file('image')->storeAs('categories/images', $fileName, 'public'));
 
                 return [
                     'message' => 'category created successfully',
@@ -70,8 +66,7 @@ class CategoriesController extends Controller
      * Display the specified resource.
      *
      */
-    public function show(string $id)
-    {
+    public function show(string $id){
         $category = Category::where('id',$id)
              ->with(['products','products.owner' => function ($query) {
                 $query->where('name','like','%a%');
@@ -155,7 +150,6 @@ class CategoriesController extends Controller
 
                 return [
                     'message' => 'category deleted successfully',
-                    'data' => $category
                 ];
             });
             return response()->json($responseData);

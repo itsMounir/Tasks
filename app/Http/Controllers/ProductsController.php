@@ -35,14 +35,13 @@ class ProductsController extends Controller
 
                 $product = Product::create($request->input());
 
-                if ($request->hasFile('images')) {
-                    $images = $request->file('images');
-                    $i =0;
-                    foreach ($images as $image) {
-                        $fileName = 'product-' . (time() + $i++). '.' . $image->getClientOriginalExtension();
-                        $product->storeImage($image->storeAs('products/images', $fileName, 'public'));
-                    }
+                $images = $request->file('images');
+                $i =0;
+                foreach ($images as $image) {
+                    $fileName = 'product-' . (time() + $i++). '.' . $image->getClientOriginalExtension();
+                    $product->storeImage($image->storeAs('products/images', $fileName, 'public'));
                 }
+
         return [
             'message' => 'success',
             'data' => $product

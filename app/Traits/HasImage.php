@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Image;
+use App\Models\Product;
 
 trait HasImage
 {
@@ -10,7 +11,13 @@ trait HasImage
     public static function bootHasImage()
     {
         static::deleting(function ($model) {
-            $model->deleteImages();
+            if ($model instanceof Product) {
+                $model->deleteImages();
+            }
+            else {
+                $model->deleteImage();
+            }
+
         });
 
     }

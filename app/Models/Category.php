@@ -10,6 +10,16 @@ class Category extends Model
 {
     use HasFactory,HasImage;
 
+    protected static function booted() {
+        static::deleting(function ($category) {
+            if (! $category->childrens->isEmpty()) {
+                foreach ($category->childrens as $child) {
+                    $child->delete();
+                }
+            }
+        });
+    }
+
     protected $with = ['image:id,url,imageable_id','childrens','products'];
 
     protected $guarded = [];

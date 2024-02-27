@@ -44,10 +44,9 @@ class UsersController extends Controller
             // $url = $request->file('image')->store('images','public');
             $user->save();
 
-            if ($request->hasFile('image')) {
-                $fileName = 'user-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
-                $user->storeImage($request->file('image')->storeAs('users/images', $fileName, 'public'));
-            }
+            $fileName = 'user-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
+            $user->storeImage($request->file('image')->storeAs('users/images', $fileName, 'public'));
+
 
             return [
                 'message' => 'success',

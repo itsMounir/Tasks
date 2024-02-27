@@ -21,9 +21,9 @@ class Product extends Model
     {
         static::addGlobalScope(new PriceScope);
 
-        if (request()->route()?->getName() == 'categories.show' || request()->route()?->getName() == 'categories.index') {
-            static::addGlobalScope(new OwnerNameScope);
-        }
+        // if (request()->route()?->getName() == 'categories.show' || request()->route()?->getName() == 'categories.index') {
+        //     static::addGlobalScope(new OwnerNameScope);
+        // }
     }
 
     public function scopeFilter($query,array $filters)
