@@ -21,9 +21,10 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'password'
     ];
 
-    protected $appends = ['created_from'];
+    protected $appends = ['created_from','image'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -45,7 +46,6 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    protected $with = ['image:id,url,imageable_id'];
 
 
     public function products() {

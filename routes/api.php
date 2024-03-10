@@ -1,10 +1,9 @@
 <?php
 
-use App\Http\Controllers\CategoriesController;
-use App\Http\Controllers\ProductsController;
-use App\Http\Controllers\UsersController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,11 +20,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::prefix('v1/')->group(function () {
-    Route::apiResource('users', UsersController::class);
-    Route::apiResource('products', ProductsController::class);
-    Route::apiResource('categories', CategoriesController::class);
+// $dire = __DIR__ . './Test/';
+
+Route::prefix('v1/')->middleware('auth:sanctum')->group(function ()  {
+    include __DIR__ . '\\Developers\\Users.php';
+    include __DIR__ . '\\Developers\\Products.php';
+    include __DIR__ . '\\Developers\\Categories.php';
+    // include "{$dire}Products.php";
+    // include "{$dire}Categories.php";
 });
 
-// Route::delete('image',[CategoryController::class,'deleteImage']);
+include __DIR__ . '\\Developers\\Auth.php';
+
 

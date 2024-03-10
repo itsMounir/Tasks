@@ -26,22 +26,6 @@ class Image extends Model
     }
 
     protected $guarded = [];
-
-    protected function url(): Attribute
-    {
-        if (! (request()->route()->getName() == 'categories.destroy' || request()->route()->getName() == 'users.destroy' || request()->route()->getName() == 'products.destroy')) {
-            return Attribute::make(
-                get: fn (string $value) => asset($value),
-            );
-        }
-        else {
-            return Attribute::make(
-                get: fn (string $value) => $value,
-            );
-        }
-
-    }
-
     public function imageable()
     {
         return $this->morphTo();

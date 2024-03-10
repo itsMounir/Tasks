@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use App\Scopes\OwnerNameScope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Notifications\Products\Deleted;
 use App\Traits\HasImage;
 use App\Scopes\PriceScope;
 
@@ -14,16 +16,20 @@ class Product extends Model
 
     protected $guarded = [];
 
-    protected $appends = ['created_from'];
+    protected $appends = ['created_from','image'];
 
 
     protected static function booted()
     {
         static::addGlobalScope(new PriceScope);
 
-        // if (request()->route()?->getName() == 'categories.show' || request()->route()?->getName() == 'categories.index') {
-        //     static::addGlobalScope(new OwnerNameScope);
-        // }
+        parent::boot();
+
+        static::deleting(function ($product) {
+                $product->owner->notify(new Deleted("The product “ $product->name ” has been deleted
+                    from the system."));
+        });
+
     }
 
     public function scopeFilter($query,array $filters)
@@ -41,13 +47,16 @@ class Product extends Model
                 $query->where('category_id',$category)));
     }
 
-    protected $with = ['image:id,url,imageable_id'];
     public function category() {
         return $this->belongsTo(Category::class,'category_id');
     }
 
     public function owner() {
         return $this->belongsTo(User::class,'user_id');
+    }
+
+    public function user() {
+        return $this->owner();
     }
 
     public function image(){
@@ -58,4 +67,12 @@ class Product extends Model
         return $this->created_at->diffForHumans();
     }
 
+    public function scopeUsername( Builder $builder ) {
+        $builder->whereRelation('user', 'name', 'like', '%a%');
+    }
+
+    public function changeStatus(String $status):void {
+        $this->status = $status;
+        $this->save();
+    }
 }

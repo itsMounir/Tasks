@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
 
         User::factory()->create([
             'name' => 'Mounir',
-            'email' => 'mounir@example.com',
+            'email' => 'mounirtoo.22@gmail.com',
+            'password' => bcrypt('123456879'),
         ]);
 
         User::factory()->create([
@@ -29,13 +30,11 @@ class DatabaseSeeder extends Seeder
         Category::factory()->create([
             'name' => 'Tech',
             'parent_id' => null,
-            'type' => 'main'
         ]);
 
         Category::factory()->create([
             'name' => 'Candies',
             'parent_id' => null,
-            'type' => 'main'
         ]);
 
         Product::factory()->create([

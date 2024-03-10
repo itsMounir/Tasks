@@ -47,4 +47,13 @@ trait HasImage
         $this->image?->delete();
     }
 
+    public function getImageAttribute() {
+        return $this->image()
+            ->get(['imageable_type', 'url'])
+            ->map(function($image) {
+                unset($image->imageable_type);
+                return asset('public/' . $image->url);
+            });
+    }
+
 }

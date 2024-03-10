@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\User\StoreUserRequest;
-use App\Http\Requests\User\UpdateUserRequest;
+use App\Http\Requests\User\{StoreUserRequest,UpdateUserRequest};
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -14,12 +13,9 @@ class UsersController extends Controller
      */
     public function index()
     {
-        // $data = User::latest()->paginate(100)->all();
         $data = User::latest()->get();
-        $message = 'success';
-
         return response()->json([
-            'message' => $message,
+            'message' => 'success',
             'data' => $data
         ],200);
     }
@@ -29,38 +25,20 @@ class UsersController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-
-        //dd($request->file('picture')->store('pictures'));
-        try {
-            $responseData = DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request) {
             $user = new User;
-
-             $user->forceFill(array_merge([
+            $user->forceFill(array_merge([
                 'password' => $request->password,
-            ],$request->input()));
-
-            //dd($user);
-
-            // $url = $request->file('image')->store('images','public');
+                ],$request->input()));
             $user->save();
 
             $fileName = 'user-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
             $user->storeImage($request->file('image')->storeAs('users/images', $fileName, 'public'));
-
-
-            return [
+            return response()->json( [
                 'message' => 'success',
                 'data' => $user
-            ];
-
-            });
-
-            return response()->json($responseData);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'message' => 'failed , try again later.',
-                ]);
-        }
+            ]);
+        });
 
     }
 
@@ -69,15 +47,7 @@ class UsersController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::find($id);
-
-        if (! $user) {
-            return response()->json([
-                'message' => 'user not found',
-            ],200);
-        }
-
-
+        $user = User::findOrFail($id);
         return response()->json([
             'message' => 'success',
             'data' => $user
@@ -89,35 +59,19 @@ class UsersController extends Controller
      */
     public function update(UpdateUserRequest $request, string $id)
     {
-        try {
-            $responseData = DB::transaction(function () use ($id , $request) {
-                $user = User::find($id);
+        return DB::transaction(function () use ($id , $request) {
+            $user = User::findOrFail($id);
+            $user->update($request->input());
 
-        if (! $user) {
+            if ($request->hasFile('image')) {
+                $fileName = 'user-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
+                $user->updateImage($request->file('image')->storeAs('users/images', $fileName, 'public'));
+            }
             return response()->json([
-                'message' => 'user not found',
-            ],200);
-        }
-
-        $user->update($request->input());
-
-        if ($request->hasFile('image')) {
-            $fileName = 'user-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
-            $user->updateImage($request->file('image')->storeAs('users/images', $fileName, 'public'));
-        }
-
-
-        return [
-            'message' => 'success',
-            'data' => $user
-        ];
+                'message' => 'success',
+                'data' => $user
+        ]);
             });
-            return response()->json($responseData);
-        } catch (\Exception $e) {
-            return response()->json([
-                $e
-            ]);
-        }
     }
 
     /**
@@ -125,29 +79,15 @@ class UsersController extends Controller
      */
     public function destroy(string $id)
     {
-        try {
-            $responseData = DB::transaction(function () use($id) {
-                $user = User::find($id);
+        return DB::transaction(function () use($id) {
+            $user = User::findOrFail($id);
 
-        if (! $user) {
-            return response()->json([
-                'message' => 'user not found',
-            ],200);
-        }
+            $user->delete();
 
-        $user->delete();
-
-        return [
-            'message' => 'user deleted successfully',
-            'data' => $user
-        ];
-            });
-            return response()->json($responseData);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'failed , try again later.',
+            return response()->json( [
+                'message' => 'user deleted successfully',
+                'data' => $user
             ]);
-        }
-
+        });
     }
 }

@@ -19,7 +19,6 @@ class CategoryFactory extends Factory
         return [
             'name' => fake()->word(),
             'parent_id'=> fake()->numberBetween(1,2),
-            'type' => fake()->randomElement(['main', 'sub'])
         ];
     }
 }

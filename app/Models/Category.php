@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\{
+    Factories\HasFactory,
+    Builder,
+    Model
+};
 use App\Traits\HasImage;
 
 class Category extends Model
@@ -20,11 +23,9 @@ class Category extends Model
         });
     }
 
-    protected $with = ['image:id,url,imageable_id','childrens','products'];
-
     protected $guarded = [];
 
-    protected $appends = ['created_from'];
+    protected $appends = ['created_from','image'];
 
     public function products() {
         return $this->hasMany(Product::class);
@@ -35,10 +36,20 @@ class Category extends Model
     }
 
     public function childrens() {
-        return $this->hasMany(Category::class,'parent_id');
+        return $this->hasMany(Category::class,'parent_id')
+        ->select([
+            'id',
+            'name',
+            'parent_id',
+            'created_at'
+        ])->with(['childrens', 'products.user']);
     }
 
     public function getCreatedFromAttribute() {
         return $this->created_at->diffForHumans();
+    }
+
+    public function scopeParent(Builder $builder) {
+        $builder->whereNull('parent_id');
     }
 }
