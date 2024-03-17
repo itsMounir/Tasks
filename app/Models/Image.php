@@ -16,8 +16,7 @@ class Image extends Model
         parent::boot();
 
         static::deleting(function ($image) {
-            // dd($image->url);
-            // dd(static::where('url',$image->url)->exists());
+           // dd(static::where('url',$image->url)->exists());
             if (static::where('url',$image->url)->exists())
             {
                 Storage::disk('public')->delete($image->url);
@@ -25,7 +24,7 @@ class Image extends Model
         });
     }
 
-    protected $guarded = [];
+    protected $fillable = ['url','imageable_type','imageable_id'];
     public function imageable()
     {
         return $this->morphTo();

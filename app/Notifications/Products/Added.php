@@ -4,24 +4,20 @@ namespace App\Notifications\Products;
 
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\{Messages\MailMessage, Notification};
 
 class Added extends Notification
 {
     use Queueable;
-
-    protected $user , $product;
-
     /**
      * Create a new notification instance.
      */
-    public function __construct($user,Product $product)
+    public function __construct(protected Authenticatable $user, protected Product $product)
     {
-        $this->user = $user;
-        $this->product = $product;
+        //
     }
 
     /**
@@ -47,10 +43,10 @@ class Added extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+        return(new MailMessage)
+            ->line('The introduction to the notification.')
+            ->action('Notification Action', url('/'))
+            ->line('Thank you for using our application!');
     }
 
 }

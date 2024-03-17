@@ -12,10 +12,10 @@ trait HasImage
     {
         static::deleting(function ($model) {
             if ($model instanceof Product) {
-                $model->deleteImages();
+                $model->deleteImages($model->image()->get());
             }
             else {
-                $model->deleteImage();
+                $model->deleteImage($model->image()->get());
             }
 
         });
@@ -36,14 +36,13 @@ trait HasImage
         $this->storeImage($url);
     }
 
-    public function deleteImages() {
-        $images = $this->image;
+    public function deleteImages($images) {
         foreach ($images as $image) {
             $image?->delete();
         }
     }
 
-    public function deleteImage() {
+    public function deleteImage($image) {
         $this->image?->delete();
     }
 

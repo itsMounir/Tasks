@@ -4,10 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\User\{StoreUserRequest,UpdateUserRequest};
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class UsersController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(User::class, 'user');
+    }
     /**
      * Display a listing of the resource.
      */
@@ -29,7 +35,7 @@ class UsersController extends Controller
             $user = new User;
             $user->forceFill(array_merge([
                 'password' => $request->password,
-                ],$request->input()));
+                ],$request->except('password_confirmation','image')));
             $user->save();
 
             $fileName = 'user-' . time() . '.' . $request->file('image')->getClientOriginalExtension();
@@ -45,9 +51,8 @@ class UsersController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user)
     {
-        $user = User::findOrFail($id);
         return response()->json([
             'message' => 'success',
             'data' => $user
@@ -57,10 +62,9 @@ class UsersController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateUserRequest $request, string $id)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        return DB::transaction(function () use ($id , $request) {
-            $user = User::findOrFail($id);
+        return DB::transaction(function () use ($user , $request) {
             $user->update($request->input());
 
             if ($request->hasFile('image')) {
@@ -77,10 +81,9 @@ class UsersController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        return DB::transaction(function () use($id) {
-            $user = User::findOrFail($id);
+        return DB::transaction(function () use($user) {
 
             $user->delete();
 

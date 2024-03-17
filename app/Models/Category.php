@@ -23,7 +23,7 @@ class Category extends Model
         });
     }
 
-    protected $guarded = [];
+    protected $fillable = ['name','parent_id'];
 
     protected $appends = ['created_from','image'];
 

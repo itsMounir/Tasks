@@ -20,16 +20,21 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// $dire = __DIR__ . './Test/';
+// $dire = __DIR__ . './Developers/';
 
-Route::prefix('v1/')->middleware('auth:sanctum')->group(function ()  {
-    include __DIR__ . '\\Developers\\Users.php';
-    include __DIR__ . '\\Developers\\Products.php';
-    include __DIR__ . '\\Developers\\Categories.php';
-    // include "{$dire}Products.php";
-    // include "{$dire}Categories.php";
-});
+Route::prefix('v1/')
+    ->middleware('auth:sanctum')
+    ->group(function () {
+        include __DIR__ . '\\Developers\\Users.php';
+        include __DIR__ . '\\Developers\\Products.php';
+        include __DIR__ . '\\Developers\\Categories.php';
 
+        // owner section
+        include __DIR__ . '\\Owners\\Roles.php';
+    });
+
+
+// Auth section
 include __DIR__ . '\\Developers\\Auth.php';
 
 
