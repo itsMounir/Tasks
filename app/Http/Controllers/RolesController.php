@@ -18,7 +18,10 @@ class RolesController extends Controller
     {
         throw_if(Auth::user()->cannot('update', $role), new AuthorizationException);
         return response()->json(DB::transaction(function () use ($request, $role) {
-            $permissions = $request->all()['permissions'];
+            $permissions = [];
+            if ($request->all()) {
+                $permissions = $request->all()['permissions'];
+            }
             $role->permissions()->sync($permissions);
             return ['Done'];
         }));
