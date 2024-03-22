@@ -32,18 +32,19 @@ trait HasImage
     }
 
     public function updateImage($url) {
-        $this->image?->delete();
+        $this->image[0]?->delete();
         $this->storeImage($url);
     }
 
     public function deleteImages($images) {
         foreach ($images as $image) {
-            $image?->delete();
+            $image[0]?->delete();
         }
     }
 
     public function deleteImage($image) {
-        $this->image?->delete();
+        //dd($image[0]);
+        $image[0]?->delete();
     }
 
     public function getImageAttribute() {
@@ -51,7 +52,7 @@ trait HasImage
             ->get(['imageable_type', 'url'])
             ->map(function($image) {
                 unset($image->imageable_type);
-                return asset('public/' . $image->url);
+                return asset('public/storage/' . $image->url);
             });
     }
 

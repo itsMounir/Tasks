@@ -24,7 +24,7 @@ class Image extends Model
         });
     }
 
-    protected $fillable = ['url','imageable_type','imageable_id'];
+    protected $fillable = ['url'];
     public function imageable()
     {
         return $this->morphTo();
