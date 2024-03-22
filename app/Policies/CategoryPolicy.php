@@ -6,13 +6,8 @@ use App\Models\Category;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class CategoryPolicy
+class CategoryPolicy extends Before
 {
-
-    public function before(User $user): bool|null
-    {
-        return $user->isOwner() ? true : null;
-    }
     /**
      * Determine whether the user can view any models.
      */

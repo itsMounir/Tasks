@@ -2,19 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Role;
-use App\Models\User;
+use App\Models\{Role,User};
 use Illuminate\Auth\Access\Response;
 
-class RolePolicy
+class RolePolicy extends Before
 {
-    /**
-     * Perform pre-authorization checks.
-     */
-    public function before(User $user): bool|null
-    {
-        return $user->isOwner() ? true : null;
-    }
     /**
      * Determine whether the user can update the model.
      */

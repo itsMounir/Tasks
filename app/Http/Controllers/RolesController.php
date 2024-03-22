@@ -16,13 +16,19 @@ class RolesController extends Controller
      */
     public function update(UpdateRoleRequest $request, Role $role)
     {
-        throw_if(Auth::user()->cannot('update', $role), new AuthorizationException);
         return response()->json(DB::transaction(function () use ($request, $role) {
+
+            $role->permissions()->delete();
             $permissions = [];
+
             if ($request->all()) {
                 $permissions = $request->all()['permissions'];
+
+                foreach ($permissions as $permission) {
+                    $role->permissions()->create(['permission_id' => $permission]);
+                }
             }
-            $role->permissions()->sync($permissions);
+
             return ['Done'];
         }));
     }

@@ -23,7 +23,7 @@ class DeleteRejectedProducts extends Command
      */
     protected $description = 'Command description';
 
-    protected $timeout = 600;
+    //protected $timeout = 600;
 
 
     /**

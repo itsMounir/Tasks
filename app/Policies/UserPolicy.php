@@ -5,12 +5,8 @@ namespace App\Policies;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class UserPolicy
+class UserPolicy extends Before
 {
-    public function before(User $user, string $ability): bool|null
-    {
-        return $user->isOwner() ? true : null;
-    }
     /**
      * Determine whether the user can view any models.
      */

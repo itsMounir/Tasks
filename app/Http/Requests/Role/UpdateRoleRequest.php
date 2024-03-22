@@ -2,16 +2,18 @@
 
 namespace App\Http\Requests\Role;
 
+use App\Models\Role;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateRoleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+    public function authorize(Role $role): bool
     {
-        return true;
+        return Auth::user()->can('update',$role);
     }
 
     /**

@@ -124,15 +124,27 @@ class DatabaseSeeder extends Seeder
     public function attachPermissionsToRoles()
     {
         $ownerRole = Role::where('name', 'owner')->first();
-        $ownerRole->permissions()->attach(Permission::all());
+        $permissions = [1, 2, 3, 4, 5,6,7,8,9,10,11,12,13,];
+        foreach ($permissions as $permission) {
+            $ownerRole->permissions()->create(['permission_id' => $permission]);
+        }
 
-        $ownerRole = Role::where('name', 'super_admin')->first();
-        $ownerRole->permissions()->attach([1, 4, 5, 8, 9, 12]);
+        $superAdminRole = Role::where('name', 'super_admin')->first();
+        $permissions = [1, 4, 5, 8, 9, 12];
+        foreach ($permissions as $permission) {
+            $superAdminRole->permissions()->create(['permission_id' => $permission]);
+        }
 
-        $ownerRole = Role::where('name', 'admin')->first();
-        $ownerRole->permissions()->attach([1, 5, 9]);
+        $adminRole = Role::where('name', 'admin')->first();
+        $permissions = [1, 5, 9];
+        foreach ($permissions as $permission) {
+            $adminRole->permissions()->create(['permission_id' => $permission]);
+        }
 
-        $ownerRole = Role::where('name', 'supervisor')->first();
-        $ownerRole->permissions()->attach([2, 6, 10]);
+        $supervisorRole = Role::where('name', 'supervisor')->first();
+        $permissions = [2, 6, 10];
+        foreach ($permissions as $permission) {
+            $supervisorRole->permissions()->create(['permission_id' => $permission]);
+        }
     }
 }
