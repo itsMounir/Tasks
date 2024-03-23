@@ -66,9 +66,9 @@ class User extends Authenticatable
         return $this->created_at->diffForHumans();
     }
 
-    public function isOwner(): bool
+    public function isOwner(): bool|null
     {
-        return ($this->role->name == 'owner');
+        return ($this->role->name == 'owner'?true:null);
     }
 
     public function hasPermission(string $permission): bool

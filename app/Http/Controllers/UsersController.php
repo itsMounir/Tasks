@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\UsersFilters;
 use App\Http\Requests\User\{StoreUserRequest,UpdateUserRequest};
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -17,9 +18,9 @@ class UsersController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(UsersFilters $usersFilters)
     {
-        $data = User::latest()->get();
+        $data = $usersFilters->applyFilters(User::query())->get();
         return response()->json([
             'message' => 'success',
             'data' => $data

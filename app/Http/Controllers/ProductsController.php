@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\CategoriesFilters;
+use App\Filters\ProductsFilters;
 use App\Http\Requests\Product\{
     StoreProductRequest,
     UpdateProductRequest
 };
 use App\Models\{Product, User};
+use App\Models\Category;
 use App\Notifications\Products\{
     Approval,
     Added,
 };
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\{
     Auth,
     DB,
@@ -29,9 +33,9 @@ class ProductsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(ProductsFilters $productsFilters)
     {
-        $data = Product::latest()->get();
+        $data = $productsFilters->applyFilters(Product::query())->get();
         return response()->json([
             'message' => 'success',
             'data' => $data

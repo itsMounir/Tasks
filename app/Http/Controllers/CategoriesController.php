@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\CategoriesFilters;
 use App\Http\Requests\Categoty\{StoreCategotyRequest, UpdateCategotyRequest};
 use App\Models\Category;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -18,9 +19,10 @@ class CategoriesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(CategoriesFilters $categoriesFilters)
     {
-        $data = Category::with(['childrens', 'products.owner'])->parent()->get();
+        $categories = Category::with(['childrens', 'products.owner']);
+        $data = $categoriesFilters->applyFilters($categories)->parent()->get();
         return response()->json([
             'message' => 'success',
             'data' => $data
